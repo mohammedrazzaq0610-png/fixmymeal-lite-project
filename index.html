@@ -6,71 +6,125 @@
 <title>FixMyMeal Lite</title>
 
 <style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
 body {
-  font-family: Arial;
-  background: #f0fff4;
-  text-align: center;
-  margin: 0;
-}
-.dark {
-  background: #121212;
-  color: white;
-}
-.container {
-  padding: 20px;
-}
-button {
-  padding: 10px;
-  margin: 10px;
-  border: none;
-  background: #22c55e;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-}
-input, select {
-  padding: 8px;
-  margin: 10px;
-}
-.card {
-  margin-top: 20px;
-  padding: 15px;
-  background: white;
-  border-radius: 10px;
-}
-.dark .card {
-  background: #1e1e1e;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f8fafc;
+  color: #1e293b;
 }
 
-/* Wheel */
+/* DARK MODE */
+.dark { background:#0f172a; color:#e2e8f0; }
+
+/* HEADER */
+.header {
+  padding:20px;
+  border-bottom:1px solid #e2e8f0;
+}
+.dark .header { border-color:#334155; }
+
+.title { font-size:22px; font-weight:600; }
+.subtitle { font-size:14px; color:#64748b; }
+
+/* TOGGLE */
+.toggle {
+  position:absolute;
+  right:20px;
+  top:20px;
+  cursor:pointer;
+}
+
+/* CONTAINER */
+.container {
+  max-width:450px;
+  margin:auto;
+  padding:20px;
+}
+
+/* INPUTS */
+input, select {
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border:1px solid #cbd5e1;
+  border-radius:6px;
+  background:white;
+}
+.dark input, .dark select {
+  background:#1e293b;
+  color:white;
+  border-color:#334155;
+}
+
+/* BUTTON */
+button {
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:hover { background:#1d4ed8; }
+
+/* CARD */
+.card {
+  margin-top:20px;
+  padding:15px;
+  background:white;
+  border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+.dark .card { background:#1e293b; }
+
+/* VISUAL */
+.food-visual {
+  height:120px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:40px;
+  background:linear-gradient(135deg,#e2e8f0,#cbd5f5);
+}
+.dark .food-visual {
+  background:linear-gradient(135deg,#1e293b,#334155);
+}
+
+/* WHEEL */
 .wheel {
-  width: 150px;
-  height: 150px;
-  margin: auto;
-  border-radius: 50%;
-  background: conic-gradient(
-    #22c55e 0% 16.6%,
-    #16a34a 16.6% 33.3%,
-    #4ade80 33.3% 50%,
-    #15803d 50% 66.6%,
-    #86efac 66.6% 83.3%,
-    #166534 83.3% 100%
+  width:140px;
+  height:140px;
+  margin:20px auto;
+  border-radius:50%;
+  background:conic-gradient(
+    #2563eb 0% 16.6%,
+    #3b82f6 16.6% 33.3%,
+    #60a5fa 33.3% 50%,
+    #1d4ed8 50% 66.6%,
+    #93c5fd 66.6% 83.3%,
+    #1e40af 83.3% 100%
   );
-  transition: transform 3s ease-out;
+  transition:transform 3s ease-out;
 }
 </style>
 </head>
 
 <body>
 
-<button onclick="toggleTheme()">🌗 Toggle Mode</button>
+<button class="toggle" onclick="toggleTheme()">🌙</button>
+
+<div class="header">
+  <h2 class="title">FixMyMeal Lite</h2>
+  <p class="subtitle">Smart Food Decision Assistant</p>
+</div>
 
 <div class="container">
 
-<h2>FixMyMeal Lite</h2>
-<p>"Best food based on your real situation"</p>
-
-<input type="range" id="budget" min="50" max="200" value="100"><br>
+<input type="range" id="budget" min="50" max="200" value="100">
 
 <select id="food">
 <option value="">Food Type</option>
@@ -88,17 +142,15 @@ input, select {
 <option value="general">General</option>
 </select>
 
-<br>
 <input type="date" id="birthday">
 
-<br>
 <button onclick="suggest()">What Should I Eat?</button>
 
-<div class="card" id="result"></div>
+<div id="result"></div>
 
 <hr>
 
-<h3>🎡 Lucky Wheel</h3>
+<h3>🎡 Spin & Win</h3>
 <div class="wheel" id="wheel"></div>
 <button onclick="spin()">Spin</button>
 <p id="offer"></p>
@@ -111,83 +163,80 @@ function toggleTheme(){
 }
 
 function isBirthday(){
- const b = document.getElementById("birthday").value;
+ let b=document.getElementById("birthday").value;
  if(!b) return false;
- const d = new Date();
- const bd = new Date(b);
+ let d=new Date(), bd=new Date(b);
  return d.getDate()==bd.getDate() && d.getMonth()==bd.getMonth();
 }
 
-function suggest(){
- let food = document.getElementById("food").value;
- let health = document.getElementById("health").value;
+function getIcon(meal){
+ if(meal.includes("Rice")) return "🍚";
+ if(meal.includes("Egg")) return "🥚";
+ if(meal.includes("Roti")) return "🫓";
+ if(meal.includes("Chicken")) return "🍗";
+ if(meal.includes("Idli")) return "🥥";
+ return "🥗";
+}
 
- if(!food || !health){
-  alert("Select all fields");
-  return;
- }
+function suggest(){
+ let food=document.getElementById("food").value;
+ let health=document.getElementById("health").value;
+
+ if(!food||!health){ alert("Select all fields"); return; }
 
  let meal="", reason="", price=80;
 
- // ACIDITY
  if(health=="acidity"){
   if(food=="mess"){ meal="Rice + Curd + Banana"; reason="Cools stomach"; price=70;}
   else if(food=="home"){ meal="Khichdi + Curd"; reason="Light food"; price=60;}
   else{ meal="Idli + Coconut Chutney"; reason="Low oil"; price=80;}
  }
 
- // WEAKNESS
  else if(health=="weakness"){
   if(food=="mess"){ meal="Roti + Dal + Egg"; reason="Energy boost"; price=90;}
-  else if(food=="home"){ meal="Rice + Dal + Egg"; reason="High nutrition"; price=100;}
+  else if(food=="home"){ meal="Rice + Dal + Egg"; reason="Nutrition"; price=100;}
   else{ meal="Egg Roll + Banana Shake"; reason="Quick energy"; price=100;}
  }
 
- // WEIGHT LOSS
  else if(health=="weightloss"){
   if(food=="mess"){ meal="Roti + Dal + Salad"; reason="Low calorie"; price=80;}
   else if(food=="home"){ meal="Veggies + Roti"; reason="High fiber"; price=70;}
-  else{ meal="Veg Sandwich"; reason="Light meal"; price=60;}
+  else{ meal="Veg Sandwich"; reason="Light"; price=60;}
  }
 
- // 💪 MUSCLE GAIN
  else if(health=="musclegain"){
   if(food=="mess"){ meal="Rice + Dal + 2 Eggs"; reason="High protein"; price=100;}
   else if(food=="home"){ meal="Chapati + Egg Curry + Milk"; reason="Muscle growth"; price=120;}
   else{ meal="Chicken Roll + Eggs"; reason="Protein rich"; price=120;}
  }
 
- // GENERAL
  else{
-  if(food=="mess"){ meal="Rice + Dal + Veg + Curd"; reason="Balanced meal"; price=90;}
+  if(food=="mess"){ meal="Rice + Dal + Veg + Curd"; reason="Balanced"; price=90;}
   else if(food=="home"){ meal="Chapati + Sabzi + Dal"; reason="Healthy"; price=80;}
   else{ meal="Paneer Wrap + Juice"; reason="Balanced"; price=100;}
  }
 
- // Birthday discount
- if(isBirthday()){
-  price *= 0.8;
-  alert("🎉 Happy Birthday! 20% OFF");
- }
+ if(isBirthday()){ price*=0.8; alert("🎉 Birthday Discount!"); }
 
- let score = Math.floor(Math.random()*3)+7;
+ let score=Math.floor(Math.random()*3)+7;
 
- document.getElementById("result").innerHTML =
-  "<h3>"+meal+"</h3>" +
-  "<p>"+reason+"</p>" +
-  "<p>💰 Price: ₹"+Math.floor(price)+"</p>" +
-  "<p>⭐ Health Score: "+score+"/10</p>";
+ document.getElementById("result").innerHTML=
+ `<div class="card">
+   <div class="food-visual">${getIcon(meal)}</div>
+   <h3>${meal}</h3>
+   <p>${reason}</p>
+   <p>💰 ₹${Math.floor(price)}</p>
+   <p>⭐ ${score}/10</p>
+ </div>`;
 }
 
 function spin(){
- const wheel = document.getElementById("wheel");
- const offers = ["10% OFF","20% OFF","Free Fruit","Try Again","Healthy Upgrade"];
- let i = Math.floor(Math.random()*offers.length);
- let deg = 360*5 + i*72;
- wheel.style.transform="rotate("+deg+"deg)";
- setTimeout(()=>{
-  document.getElementById("offer").innerText="🎉 You got: "+offers[i];
- },3000);
+ let wheel=document.getElementById("wheel");
+ let offers=["10% OFF","20% OFF","Free Fruit","Try Again","Healthy Upgrade"];
+ let i=Math.floor(Math.random()*offers.length);
+ let deg=360*5+i*72;
+ wheel.style.transform=`rotate(${deg}deg)`;
+ setTimeout(()=>{ document.getElementById("offer").innerText="🎉 "+offers[i]; },3000);
 }
 </script>
 
