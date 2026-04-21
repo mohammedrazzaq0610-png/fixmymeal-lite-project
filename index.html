@@ -95,7 +95,7 @@ input, select {
 
 <br>
 <input type="date" id="birthday">
-<input type="text" id="student" placeholder="Student ID">
+
 
 <br>
 <button onclick="suggest()">What Should I Eat?</button>
@@ -124,11 +124,7 @@ function isBirthday(){
  return d.getDate()==bd.getDate() && d.getMonth()==bd.getMonth();
 }
 
-function studentDiscount(){
- const id = document.getElementById("student").value;
- if(id.length>=5) return 15;
- return 0;
-}
+
 
 function suggest(){
  let budget = document.getElementById("budget").value;
@@ -159,10 +155,7 @@ function suggest(){
   price*=0.8;
  }
 
- let sd = studentDiscount();
- if(sd>0){
-  price -= price*sd/100;
- }
+
 
  document.getElementById("result").innerHTML =
   "<h3>"+meal+"</h3><p>"+reason+"</p><p>Price: ₹"+Math.floor(price)+"</p>";
