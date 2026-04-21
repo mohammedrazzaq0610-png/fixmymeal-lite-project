@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="FixMyMeal Lite – Smart Food Decision Assistant. Not what is healthy, but what is best for YOU right now." />
+  <title>FixMyMeal Lite – Smart Food Decision Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <span class="logo-icon">🥗</span>
+      <div>
+        <h1 class="logo">FixMyMeal <span class="accent">Lite</span></h1>
+        <p class="tagline-sub">Smart Food Decision Assistant</p>
+      </div>
+    </div>
+    <p class="tagline">"Not what is healthy, but what is best for <em>YOU</em> right now."</p>
+  </header>
+
+  <!-- DEMO HINT -->
+  <div class="demo-hint" id="demo-hint">
+    <span class="hint-icon">💡</span>
+    <span>Try it: Set budget to ₹100 → Pick "Mess Food" → Pick "Acidity" → See instant suggestion!</span>
+    <button class="hint-close" onclick="closeHint()" aria-label="Close hint">✕</button>
+  </div>
+
+  <main class="container">
+
+    <!-- TABS -->
+    <nav class="tabs" role="tablist">
+      <button class="tab active" id="tab-suggest" role="tab" onclick="switchTab('suggest')">🍽️ What Should I Eat?</button>
+      <button class="tab" id="tab-fix" role="tab" onclick="switchTab('fix')">🔧 Fix My Plate</button>
+    </nav>
+
+    <!-- ========== PANEL 1: SUGGEST ========== -->
+    <section class="panel" id="panel-suggest">
+      <h2 class="section-title">Tell Us Your Situation</h2>
+
+      <!-- Budget -->
+      <div class="field">
+        <label class="label" for="budget">💰 Your Budget <span class="badge" id="budget-val">₹100</span></label>
+        <input type="range" id="budget" class="slider" min="50" max="200" step="10" value="100" oninput="onInputChange()" />
+        <div class="slider-range"><span>₹50</span><span>₹200</span></div>
+      </div>
+
+      <!-- Food Type -->
+      <div class="field">
+        <label class="label" for="food-type">🏠 Food Available</label>
+        <div class="select-wrap">
+          <select id="food-type" class="select" onchange="onInputChange()">
+            <option value="">— Select Food Type —</option>
+            <option value="mess">🍛 Mess Food</option>
+            <option value="home">🏠 Home-Cooked</option>
+            <option value="street">🛺 Street Food</option>
+          </select>
+          <span class="arrow">▾</span>
+        </div>
+      </div>
+
+      <!-- Health -->
+      <div class="field">
+        <label class="label" for="health">❤️ Health Condition</label>
+        <div class="select-wrap">
+          <select id="health" class="select" onchange="onInputChange()">
+            <option value="">— Select Condition —</option>
+            <option value="acidity">🔥 Acidity / Acid Reflux</option>
+            <option value="weakness">💪 Weakness / Low Energy</option>
+            <option value="weightloss">⚖️ Weight Loss</option>
+            <option value="general">😊 General / Healthy</option>
+          </select>
+          <span class="arrow">▾</span>
+        </div>
+      </div>
+
+      <button class="cta" id="suggest-btn" onclick="getSuggestion()">
+        <span>🔍</span> What Should I Eat Now?
+      </button>
+
+      <!-- Result -->
+      <div class="result-card hidden" id="suggest-result">
+        <div class="result-head">
+          <span class="result-emoji" id="r-emoji">🍽️</span>
+          <div>
+            <p class="result-tag">Recommended Meal</p>
+            <h3 class="result-meal" id="r-meal">—</h3>
+          </div>
+          <div class="health-ring" id="r-ring">
+            <span class="ring-num" id="r-score">0</span>
+            <span class="ring-label">/10</span>
+          </div>
+        </div>
+
+        <div class="result-body">
+          <div class="rb-section">
+            <p class="rb-title">💡 Why This Meal?</p>
+            <p class="rb-text" id="r-reason">—</p>
+          </div>
+          <div class="rb-section warn-section">
+            <p class="rb-title">⚠️ Trade-off</p>
+            <p class="rb-text" id="r-tradeoff">—</p>
+          </div>
+          <div class="rb-section upgrade-section">
+            <p class="rb-title">⬆️ Upgrade Suggestion</p>
+            <p class="rb-text" id="r-upgrade">—</p>
+          </div>
+          <div class="rb-section">
+            <p class="rb-title">✅ Quick Tips</p>
+            <ul class="tips" id="r-tips"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Tip -->
+      <button class="tip-btn" onclick="showDailyTip()">🌿 Show Me a Daily Health Tip</button>
+      <div class="tip-card hidden" id="daily-tip">
+        <p id="tip-text">—</p>
+      </div>
+    </section>
+
+    <!-- ========== PANEL 2: FIX MY PLATE ========== -->
+    <section class="panel hidden" id="panel-fix">
+      <h2 class="section-title">What Did You Eat?</h2>
+      <p class="section-desc">Select everything you had in your last meal.</p>
+
+      <div class="food-grid" id="food-grid">
+        <label class="chip"><input type="checkbox" value="rice" onchange="toggleChip(this)"><span class="ci">🍚</span><span>White Rice</span></label>
+        <label class="chip"><input type="checkbox" value="oily_curry" onchange="toggleChip(this)"><span class="ci">🍛</span><span>Oily Curry</span></label>
+        <label class="chip"><input type="checkbox" value="roti" onchange="toggleChip(this)"><span class="ci">🫓</span><span>Roti</span></label>
+        <label class="chip"><input type="checkbox" value="dal" onchange="toggleChip(this)"><span class="ci">🥣</span><span>Dal / Lentils</span></label>
+        <label class="chip"><input type="checkbox" value="fried" onchange="toggleChip(this)"><span class="ci">🍟</span><span>Fried Snacks</span></label>
+        <label class="chip"><input type="checkbox" value="soda" onchange="toggleChip(this)"><span class="ci">🥤</span><span>Soda / Cola</span></label>
+        <label class="chip"><input type="checkbox" value="salad" onchange="toggleChip(this)"><span class="ci">🥗</span><span>Salad / Veggies</span></label>
+        <label class="chip"><input type="checkbox" value="egg" onchange="toggleChip(this)"><span class="ci">🥚</span><span>Eggs</span></label>
+        <label class="chip"><input type="checkbox" value="fruit" onchange="toggleChip(this)"><span class="ci">🍌</span><span>Fruits</span></label>
+        <label class="chip"><input type="checkbox" value="milk" onchange="toggleChip(this)"><span class="ci">🥛</span><span>Milk / Curd</span></label>
+        <label class="chip"><input type="checkbox" value="spicy" onchange="toggleChip(this)"><span class="ci">🌶️</span><span>Spicy Food</span></label>
+        <label class="chip"><input type="checkbox" value="sweets" onchange="toggleChip(this)"><span class="ci">🍮</span><span>Sweets</span></label>
+      </div>
+
+      <button class="cta" id="fix-btn" onclick="analysePlate()"><span>🔧</span> Analyse My Plate</button>
+
+      <div class="result-card hidden" id="fix-result">
+        <div class="score-row">
+          <span class="score-label">Plate Health Score</span>
+          <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+          <span class="score-val" id="score-val">—</span>
+        </div>
+        <div class="rb-section" id="fix-prob-wrap">
+          <p class="rb-title problem-title">⚠️ What's Wrong</p>
+          <ul class="fix-list" id="fix-problems"></ul>
+        </div>
+        <div class="rb-section" id="fix-imp-wrap">
+          <p class="rb-title improve-title">🌱 How to Improve</p>
+          <ul class="fix-list green" id="fix-improve"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>🌿 FixMyMeal Lite &nbsp;|&nbsp; Food &amp; Health Ideathon &nbsp;|&nbsp; Eat Smart, Live Well</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
